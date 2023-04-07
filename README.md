@@ -6,6 +6,15 @@
 
 개요: 십자수는 예전에 많이 하던 취미활동으로 인테리어를 할 때 많이 쓰이기도 했다. 하지만 요즘에는 실로 하는 십자수를 많이 하는 편은 아니다. 대신 보석 십자수, 핸드폰 개임 등으로 십자수가 다시 인기를 얻기 시작했다. 이렇게 다양한 방식으로 다시 떠오르는 십자수와 올해의 시즌 컬러를 합쳐 인기 십자수 도안을 예측할 것이다. 올해의 시즌컬러를 예측하고 그냥 도안에 넣는 것이 아닌 시즌 컬러와 어울리는 색조합 중에서도 사람들에게 인기 많은 색조합을 도안에 넣을 것이다. 전년도 기반으로 올해의 시즌컬러를 예측해서 시즌컬러가 들어간 도안을 넣었을 때 인기가 있을 것이라는 것을 예측하겠다.
 
+datafile) 예측 모델 훈련시 사용된 데이터와 검증시 사용한 데이터 
+ - 형식은 csv or 엑셀 or SQL문
+
+<검증시 사용한 데이터>
+-(2021.csv)
+
+<훈련시 사용된 데이터>
+-(2023.csv)
+
 2) 데이터베이스 구성
 
 2-1) 개체-관계 다이어그램
@@ -76,7 +85,6 @@
 
 2.웹, 예측모델: 인기 색조합과 도안
   도안과 색조합을 표현하는 데 웹을 선택한 이유는 웹이 가장 도안의 느낌을 표현하기 괜찮다고 생각했다. 도안과 시즌컬러의 색조합표를 보여주기에 R과 같이 그래프 같은 것으로 표현하기가 어렵다고 생각되어 웹으로 예시 도안과 그것에 어울릴 만한 색조합표들을 보여줄 것이다. 
-  
 
 3-3) 검증 방법론 
 
@@ -121,63 +129,3 @@ R script를 실행시키면 역대 시즌 컬러의 주기를 볼 수 있고 그
 
 올해의 시즌컬러를 정하는 법 : 색상의10년주기, 런던 뉴욕 컬러, 사회성
 주기나 컬러 분류는 R로 만들 수 있었지만 사회성은 코드로 표현 넣기 어려웠다. (23년도 예시: 우크라이나 전쟁, 코로나 해방) 따라서 사회성을 자체적으로 판단했다.
-
-datafile) 예측 모델 훈련시 사용된 데이터와 검증시 사용한 데이터 
- - 형식은 csv or 엑셀 or SQL문
-
-<검증시 사용한 데이터>
--(2021.csv)
--2021 예상 컬러색 뽑기 
-
-    SELECT * FROM ds_color.seasoncolor;
-    SELECT colorname,Hexcode,color, SYMBOL FROM ds_color.rn2021
-    WHERE color ='YELLOW' OR color='GRAY'
-
--2021 팬톤(뉴욕, 런던) 겹치는 컬러
-
-    SELECT colorname,hexcode,cv, SYMBOL, COUNT(Hexcode),count(colorname),count(cv) FROM ds_color.rn2021
-    GROUP BY Hexcode
-    HAVING COUNT(Hexcode) > 1;
-
-<훈련시 사용된 데이터>
-
--(2023.csv)
-
--2023 예상 컬러색 뽑기 
-
-    SELECT * FROM ds_color.seasoncolor;
-    SELECT colorname,Hexcode,color, SYMBOL FROM ds_color.rn2223
-    WHERE color ='BLUE' OR color='GRAY'
-
--2023 팬톤(뉴욕, 런던) 겹치는 컬러
-
-    SELECT colorname,Hexcode,cv, SYMBOL, COUNT(Hexcode),count(colorname),count(cv) FROM ds_color.rn2223
-    GROUP BY Hexcode
-    HAVING COUNT(Hexcode) > 1;
-
-첨부 1) 데이터베이스 구성에 사용된 SQL 소스 코드
-
-<R에 쓰인 mysql 코드>
-
--2023년도 시즌 컬러
-
-    RN23 <- dbGetQuery( ds_color,
-                        "SELECT colorname,Hexcode,cv, COUNT(Hexcode),count(colorname),count(cv) FROM ds_color.RN2223
-    GROUP BY Hexcode
-    HAVING COUNT(Hexcode) > 1")
-
-
--2023년 시즌 컬러 Poppy Seed의 색조합 좋아요순 상위 5개
-
-    Like58575C <- dbGetQuery( ds_color,
-                              "SELECT HexCol1, HexCol2, HexCol3, HexCol4, Popular FROM ds_color.likecolor 
-    WHERE HexCol1 = '58575C' OR HexCol2 = '58575C' OR HexCol3 = '58575C' OR HexCol4 = '58575C' 
-    ORDER BY Popular  DESC limit 5")
-
-
--2023년 시즌 컬러 Waterspout의 색조합 좋아요순 상위 5개
-
-    Like7AD1D8 <- dbGetQuery( ds_color,
-                              "SELECT HexCol1, HexCol2, HexCol3, HexCol4, Popular FROM ds_color.likecolor 
-    WHERE HexCol1 = '7AD1D8' OR HexCol2 = '7AD1D8' OR HexCol3 = '7AD1D8' OR HexCol4 = '7AD1D8' 
-    ORDER BY Popular  DESC limit 5")
